@@ -22,9 +22,12 @@ public class CurbsideChallenge {
 
 	// Pre-defined Curbside parameters
     private final String KEY_SESSION = "Session";
-    private final String KEY_GET = "GET";
     private final int HTTP_ERROR_MIN = 400;
 	private final int REQUESTS_PER_SESSION_MAX = 10;
+
+	// Misc defines
+	private final String KEY_GET = "GET";
+	private final String KEY_NEXT = "next";
 
 	// Session info
     private String sessionId = "";
@@ -124,15 +127,21 @@ public class CurbsideChallenge {
      * @return CurbsideResponseObject
      */
     private CurbsideResponseObject deserializeJson(String json) {
+		// Change 'next' keys with mixed cases to all lowercase
+		int nextPos = json.toLowerCase().indexOf(KEY_NEXT);
+		String fixedJson = nextPos > -1 ? json.substring(0, nextPos) + KEY_NEXT + json.substring(nextPos + KEY_NEXT.length()) : json;
+
+		System.out.println(fixedJson);
+
         Gson gson = new Gson();
 		CurbsideResponseObject responseObj = null;
 		try {
-			responseObj = gson.fromJson(json, CurbsideResponseObject.class);
+			responseObj = gson.fromJson(fixedJson, CurbsideResponseObject.class);
 		}
 		catch (JsonParseException ex) {
 			// 'next' key is a string instead of an array of strings
 			try {
-				CurbsideResponseObjectSpecial special = gson.fromJson(json, CurbsideResponseObjectSpecial.class);
+				CurbsideResponseObjectSpecial special = gson.fromJson(fixedJson, CurbsideResponseObjectSpecial.class);
 				List<String> next = new ArrayList<>(Arrays.asList(special.next));
 				responseObj = new CurbsideResponseObject(special.depth, special.id, special.message, next, special.secret);
 			}
