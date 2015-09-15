@@ -16,13 +16,13 @@ import java.util.*;
 public class CurbsideChallenge {
 
 	// Pre-defined Curbside url and paths
-    private final String BASE_URL = "http://challenge.shopcurbside.com/";
-    private final String GET_SESSION_PATH = "get-session";
-    private final String START_PATH = "start";
+	private final String BASE_URL = "http://challenge.shopcurbside.com/";
+	private final String GET_SESSION_PATH = "get-session";
+	private final String START_PATH = "start";
 
 	// Pre-defined Curbside parameters
-    private final String KEY_SESSION = "Session";
-    private final int HTTP_ERROR_MIN = 400;
+	private final String KEY_SESSION = "Session";
+	private final int HTTP_ERROR_MIN = 400;
 	private final int REQUESTS_PER_SESSION_MAX = 10;
 
 	// Misc defines
@@ -30,11 +30,11 @@ public class CurbsideChallenge {
 	private final String KEY_NEXT = "next";
 
 	// Session info
-    private String sessionId = "";
+	private String sessionId = "";
 	private int requestCountForSession = 0;
 
-    public static void main(String[] args) {
-        CurbsideChallenge client = new CurbsideChallenge();
+	public static void main(String[] args) {
+		CurbsideChallenge client = new CurbsideChallenge();
 		List<CurbsideResponseObject> responses = client.getAllCurbsideResponses();
 
 		for (CurbsideResponseObject response : responses) {
@@ -42,11 +42,11 @@ public class CurbsideChallenge {
 				System.out.print(response.secret);
 			}
 		}
-    }
+	}
 
 	/**
 	 * Get all Curbside responses via breadth first search.
-	 * @return	List of CurbsideResponseObjects
+	 * @return List of CurbsideResponseObjects
 	 */
 	private List<CurbsideResponseObject> getAllCurbsideResponses() {
 		List<CurbsideResponseObject> responseObjects = new ArrayList<>();
@@ -55,7 +55,7 @@ public class CurbsideChallenge {
 		CurbsideResponseObject firstResponse = deserializeJson(sendGetRequest(START_PATH));
 		queue.add(firstResponse);
 
-		while(!queue.isEmpty()) {
+		while (!queue.isEmpty()) {
 			CurbsideResponseObject response = queue.remove();
 			responseObjects.add(response);
 
@@ -72,7 +72,7 @@ public class CurbsideChallenge {
 
 	/**
 	 * Validate current session.
-	 * @return	Valid session id
+	 * @return Valid session id
 	 */
 	private String validateSession() {
 		if (requestCountForSession >= REQUESTS_PER_SESSION_MAX || sessionId.isEmpty()) {
@@ -84,15 +84,15 @@ public class CurbsideChallenge {
 
 	/**
 	 * Send Curbside request.
-	 * @param path    Curbside url path
-	 * @return	Request response
+	 * @param path Curbside url path
+	 * @return Request response
 	 */
-    private String sendGetRequest(String path) {
-        String stringUrl = BASE_URL + path;
-        try {
-            URL url = new URL(stringUrl);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod(KEY_GET);
+	private String sendGetRequest(String path) {
+		String stringUrl = BASE_URL + path;
+		try {
+			URL url = new URL(stringUrl);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod(KEY_GET);
 
 			if (path != GET_SESSION_PATH) {
 				// Set session header
@@ -100,40 +100,40 @@ public class CurbsideChallenge {
 				requestCountForSession++;
 			}
 
-            int responseCode = con.getResponseCode();
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    responseCode >= HTTP_ERROR_MIN ? con.getErrorStream() : con.getInputStream()));
+			int responseCode = con.getResponseCode();
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					responseCode >= HTTP_ERROR_MIN ? con.getErrorStream() : con.getInputStream()));
 
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            return response.toString();
-        }
-        catch (MalformedURLException ex) {
-            System.out.println(ex);
-        }
-        catch (IOException ex) {
-            System.out.println(ex);
-        }
-        return "";
-    }
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			return response.toString();
+		}
+		catch (MalformedURLException ex) {
+			System.out.println(ex);
+		}
+		catch (IOException ex) {
+			System.out.println(ex);
+		}
+		return "";
+	}
 
-    /**
-     * Deserialize json into CurbsideResponseObject.
-     * @param json Valid json string.
-     * @return CurbsideResponseObject
-     */
-    private CurbsideResponseObject deserializeJson(String json) {
+	/**
+	 * Deserialize json into CurbsideResponseObject.
+	 * @param json Valid json string.
+	 * @return CurbsideResponseObject
+	 */
+	private CurbsideResponseObject deserializeJson(String json) {
 		// Change 'next' keys with mixed cases to all lowercase
 		int nextPos = json.toLowerCase().indexOf(KEY_NEXT);
 		String fixedJson = nextPos > -1 ? json.substring(0, nextPos) + KEY_NEXT + json.substring(nextPos + KEY_NEXT.length()) : json;
 
 		System.out.println(fixedJson);
 
-        Gson gson = new Gson();
+		Gson gson = new Gson();
 		CurbsideResponseObject responseObj = null;
 		try {
 			responseObj = gson.fromJson(fixedJson, CurbsideResponseObject.class);
@@ -149,7 +149,7 @@ public class CurbsideChallenge {
 				System.out.println(ex2);
 			}
 		}
-        return responseObj;
-    }
+		return responseObj;
+	}
 
 }
