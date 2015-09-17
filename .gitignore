@@ -1,8 +1,13 @@
+# Mac OSX
 .DS_Store
-*.gradle
-*.idea
-*.iml
-*.ipr
-*.iws
+
+# Gradle
+.gradle
 build/
-out/
+
+# Intellij IDEA
+.idea/
+*.iml
+
+# Local configuration
+local.properties
